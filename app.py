@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, redirect, session, flash
 import sqlite3
+import os
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
-app.secret_key = "jobtrack-secret-key"
+app.secret_key = os.environ.get("SECRET_KEY")
 
 def get_db_connection():
     conn = sqlite3.connect("jobtrack.db")
