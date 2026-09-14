@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Application - JobTrack</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>JobTrack</h1>
+
+        <p>Track your job and internship applications in one place.</p>
+
+        <h2>Edit Application</h2>
+
+        <form method="POST">
+
+            <label>Company Name</label>
+            <input
+                type="text"
+                name="company"
+                value="{{ application['company'] }}"
+                required
+            >
+
+            <label>Job Role</label>
+            <input
+                type="text"
+                name="role"
+                value="{{ application['role'] }}"
+                required
+            >
+
+            <label>Status</label>
+            <select name="status" required>
+
+                <option value="Applied"
+                    {% if application['status'] == 'Applied' %}selected{% endif %}>
+                    Applied
+                </option>
+
+                <option value="Interview"
+                    {% if application['status'] == 'Interview' %}selected{% endif %}>
+                    Interview
+                </option>
+
+                <option value="Rejected"
+                    {% if application['status'] == 'Rejected' %}selected{% endif %}>
+                    Rejected
+                </option>
+
+                <option value="Offer"
+                    {% if application['status'] == 'Offer' %}selected{% endif %}>
+                    Offer
+                </option>
+
+            </select>
+
+            <label>Application Date</label>
+            <input
+                type="date"
+                name="date"
+                value="{{ application['date'] }}"
+                required
+            >
+
+              <label>Notes</label>
+
+              <textarea
+                 name="notes"
+                rows="4"
+                   placeholder="Add notes about this application..."
+                 >{{ application['notes'] or '' }}</textarea>
+
+            <div class="edit-buttons">
+
+                <button type="submit">
+                    Update Application
+                </button>
+
+                <a href="/" class="cancel-button">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>

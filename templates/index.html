@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>JobTrack</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+        JobTrack
+    </div>
+
+    <div class="nav-links">
+        <a href="/">Dashboard</a>
+        <a href="#add-application">Add Application</a>
+    </div>
+
+</nav>
+
+<div class="container">
+
+    <h1>JobTrack</h1>
+
+    <p>Track your job and internship applications in one place.</p>
+
+
+<h2>Dashboard</h2>
+
+<div class="dashboard">
+
+    <div class="card">
+        <h3>Total Applications</h3>
+        <p>{{ total }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Applied</h3>
+        <p>{{ applied }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Interviews</h3>
+        <p>{{ interviews }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Rejected</h3>
+        <p>{{ rejected }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Offers</h3>
+        <p>{{ offers }}</p>
+    </div>
+
+</div>
+
+<!-- Application Analytics -->
+
+<div class="analytics-section">
+
+    <h2>Application Analytics</h2>
+
+    <div class="analytics-card">
+
+        <div class="bar-row">
+            <span class="bar-label">Applied</span>
+
+            <div class="bar-container">
+                <div class="bar applied-bar"
+                     style="width: {{ (applied / total * 100) if total else 0 }}%;">
+                </div>
+            </div>
+
+            <span class="bar-number">{{ applied }}</span>
+        </div>
+
+
+        <div class="bar-row">
+            <span class="bar-label">Interviews</span>
+
+            <div class="bar-container">
+                <div class="bar interview-bar"
+                     style="width: {{ (interviews / total * 100) if total else 0 }}%;">
+                </div>
+            </div>
+
+            <span class="bar-number">{{ interviews }}</span>
+        </div>
+
+
+        <div class="bar-row">
+            <span class="bar-label">Rejected</span>
+
+            <div class="bar-container">
+                <div class="bar rejected-bar"
+                     style="width: {{ (rejected / total * 100) if total else 0 }}%;">
+                </div>
+            </div>
+
+            <span class="bar-number">{{ rejected }}</span>
+        </div>
+
+
+        <div class="bar-row">
+            <span class="bar-label">Offers</span>
+
+            <div class="bar-container">
+                <div class="bar offer-bar"
+                     style="width: {{ (offers / total * 100) if total else 0 }}%;">
+                </div>
+            </div>
+
+            <span class="bar-number">{{ offers }}</span>
+        </div>
+
+    </div>
+
+    <!-- Conversion Rates -->
+
+<div class="conversion-rates">
+
+    <div class="rate-card">
+        <h3>Interview Rate</h3>
+        <p>
+            {{ "%.1f"|format((interviews / total * 100) if total else 0) }}%
+        </p>
+        <span>of all applications</span>
+    </div>
+
+    <div class="rate-card">
+        <h3>Offer Rate</h3>
+        <p>
+            {{ "%.1f"|format((offers / total * 100) if total else 0) }}%
+        </p>
+        <span>of all applications</span>
+    </div>
+
+    <div class="rate-card">
+        <h3>Rejection Rate</h3>
+        <p>
+            {{ "%.1f"|format((rejected / total * 100) if total else 0) }}%
+        </p>
+        <span>of all applications</span>
+    </div>
+
+</div>
+
+</div>
+
+<h2>Search & Filter</h2>
+
+<form method="GET" action="/">
+
+    <input
+        type="text"
+        name="search"
+        placeholder="Search company or role..."
+        value="{{ search }}"
+    >
+
+    <select name="status">
+
+        <option value="">All Statuses</option>
+
+        <option value="Applied"
+            {% if status == "Applied" %}selected{% endif %}>
+            Applied
+        </option>
+
+        <option value="Interview"
+            {% if status == "Interview" %}selected{% endif %}>
+            Interview
+        </option>
+
+        <option value="Rejected"
+            {% if status == "Rejected" %}selected{% endif %}>
+            Rejected
+        </option>
+
+        <option value="Offer"
+            {% if status == "Offer" %}selected{% endif %}>
+            Offer
+        </option>
+
+    </select>
+
+    <label>Sort By</label>
+
+<select name="sort">
+
+    <option value="newest"
+        {% if sort == "newest" %}selected{% endif %}>
+        Newest First
+    </option>
+
+    <option value="oldest"
+        {% if sort == "oldest" %}selected{% endif %}>
+        Oldest First
+    </option>
+
+    <option value="company_asc"
+        {% if sort == "company_asc" %}selected{% endif %}>
+        Company A → Z
+    </option>
+
+    <option value="company_desc"
+        {% if sort == "company_desc" %}selected{% endif %}>
+        Company Z → A
+    </option>
+
+</select>
+
+    <button type="submit">
+        Search
+    </button>
+
+    <a href="/">
+        Clear
+    </a>
+
+</form>
+
+    <h2 id="add-application">Add Application</h2>
+
+    <form action="/add" method="POST">
+
+    <label>Company Name</label>
+    <input type="text" name="company" placeholder="e.g. Google" required>
+
+    <br><br>
+
+    <label>Job Role</label>
+    <input type="text" name="role" placeholder="e.g. Software Engineering Intern" required>
+
+    <br><br>
+
+    <label>Status</label>
+    <select name="status">
+        <option>Applied</option>
+        <option>Interview</option>
+        <option>Rejected</option>
+        <option>Offer</option>
+    </select>
+
+    <br><br>
+
+    <label>Application Date</label>
+
+<input
+    type="date"
+    name="date"
+    required
+>
+
+<label>Notes</label>
+
+<textarea
+    name="notes"
+    placeholder="e.g. Interview scheduled, recruiter contacted, preparation notes..."
+    rows="4"
+></textarea>
+
+<button type="submit">
+    Add Application
+</button>
+
+</form>
+
+<h2>Your Applications</h2>
+
+<div class="table-container">
+    <table class="applications-table">
+
+        <tr>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+
+        {% for application in applications %}
+
+        <tr>
+            <td>{{ application["company"] }}</td>
+            <td>{{ application["role"] }}</td>
+            <td>
+            <span class="status {{ application['status']|lower }}">
+                {{ application["status"] }}
+                 </span>
+            </td>
+            <td>{{ application["date"] }}</td>
+
+         <td>
+
+    <a class="action edit"
+       href="/edit/{{ application['id'] }}">
+        Edit
+    </a>
+
+    <a class="action delete"
+       href="/delete/{{ application['id'] }}"
+       onclick="return confirm('Are you sure you want to delete this application?');">
+        Delete
+    </a>
+
+    <a class="action notes"
+       href="/notes/{{ application['id'] }}">
+        Notes
+    </a>
+
+  </td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+</div>
+</body>
+
+</html>

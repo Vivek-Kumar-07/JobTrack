@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application Notes - JobTrack</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Application Notes</h1>
+
+    <div class="notes-card">
+
+        <h2>{{ application["company"] }}</h2>
+
+        <p>
+            <strong>Role:</strong>
+            {{ application["role"] }}
+        </p>
+
+        <p>
+            <strong>Status:</strong>
+            {{ application["status"] }}
+        </p>
+
+        <p>
+            <strong>Date:</strong>
+            {{ application["date"] }}
+        </p>
+
+        <hr>
+
+<h3>Notes</h3>
+
+<form method="POST">
+
+    <textarea name="notes" class="notes-input"
+              placeholder="Add your notes here...">{{ application["notes"] or "" }}</textarea>
+
+    <button type="submit" class="update-notes-button">
+        Update Notes
+    </button>
+
+</form>
+
+<a href="/" class="back-button">
+    ← Back to Dashboard
+</a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
