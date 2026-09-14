@@ -100,6 +100,37 @@ CREATE TABLE IF NOT EXISTS status_history (
 )
 """)
 
+# Users Table
+
+conn.execute("""
+CREATE TABLE IF NOT EXISTS users (
+
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    username TEXT UNIQUE NOT NULL,
+
+    email TEXT UNIQUE NOT NULL,
+
+    password TEXT NOT NULL
+
+)
+""")
+
+
+# Add user_id column to applications table
+
+columns = conn.execute(
+    "PRAGMA table_info(applications)"
+).fetchall()
+
+existing_columns = [column[1] for column in columns]
+
+if "user_id" not in existing_columns:
+
+    conn.execute(
+        "ALTER TABLE applications ADD COLUMN user_id INTEGER"
+    )
+
 
 conn.commit()
 conn.close()
