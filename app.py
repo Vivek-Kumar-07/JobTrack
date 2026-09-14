@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, flash
 import sqlite3
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -42,9 +42,12 @@ def signup():
 
             conn.close()
 
-            return "Username or email already exists."
+            flash("Username or email already exists.", "error")
+            return redirect("/signup")
 
         conn.close()
+
+        flash("Account created successfully! Please login.", "success")
 
         return redirect("/login")
 
@@ -75,7 +78,8 @@ def login():
 
             return redirect("/")
 
-        return "Invalid email or password."
+        flash("Invalid email or password.", "error")
+        return redirect("/login")
 
     return render_template("login.html")
 
@@ -186,6 +190,10 @@ def edit_application(id):
     """,
     (id, session["user_id"])
     ).fetchone()
+
+    if application is None:
+        conn.close()
+        return "Application not found.", 404
 
     conn.close()
 
