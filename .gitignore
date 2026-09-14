@@ -1,0 +1,10 @@
+jobtrack.db
+
+__pycache__/
+*.pyc
+
+.env
+.venv/
+venv/
+
+tempCodeRunnerFile.py
