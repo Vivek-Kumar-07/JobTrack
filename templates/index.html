@@ -267,6 +267,70 @@
     rows="4"
 ></textarea>
 
+<div class="interview-fields">
+
+    <h3>Interview Details</h3>
+
+    <div class="form-group">
+
+        <label>Interview Date</label>
+
+        <input
+            type="date"
+            name="interview_date"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>Interview Time</label>
+
+        <input
+            type="time"
+            name="interview_time"
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>Interview Type</label>
+
+        <select name="interview_type">
+
+            <option value="">
+                Select interview type
+            </option>
+
+            <option value="HR">
+                HR
+            </option>
+
+            <option value="Technical">
+                Technical
+            </option>
+
+            <option value="Managerial">
+                Managerial
+            </option>
+
+            <option value="Behavioral">
+                Behavioral
+            </option>
+
+            <option value="Other">
+                Other
+            </option>
+
+        </select>
+
+    </div>
+
+</div>
+
 <button type="submit">
     Add Application
 </button>
@@ -298,10 +362,15 @@
             </td>
             <td>{{ application["date"] }}</td>
 
-         <td>
+        <td>
+
+    <a class="action view"
+       href="/details/{{ application['id'] }}">
+        View
+    </a>
 
     <a class="action edit"
-       href="/edit/{{ application['id'] }}">
+       href="{{ url_for('edit_application', id=application['id']) }}">
         Edit
     </a>
 
@@ -316,7 +385,7 @@
         Notes
     </a>
 
-  </td>
+</td>
         </tr>
 
         {% endfor %}

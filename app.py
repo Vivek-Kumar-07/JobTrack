@@ -22,13 +22,34 @@ def edit_application(id):
         date = request.form["date"]
         notes = request.form["notes"]
 
+        interview_date = request.form.get("interview_date", "")
+        interview_time = request.form.get("interview_time", "")
+        interview_type = request.form.get("interview_type", "")
+
         conn.execute(
             """
             UPDATE applications
-            SET company = ?, role = ?, status = ?, date = ?, notes = ?
+            SET company = ?,
+                role = ?,
+                status = ?,
+                date = ?,
+                notes = ?,
+                interview_date = ?,
+                interview_time = ?,
+                interview_type = ?
             WHERE id = ?
             """,
-            (company, role, status, date, notes, id)
+            (
+                company,
+                role,
+                status,
+                date,
+                notes,
+                interview_date,
+                interview_time,
+                interview_type,
+                id
+            )
         )
 
         conn.commit()
@@ -47,6 +68,26 @@ def edit_application(id):
         "edit.html",
         application=application
     )
+
+@app.route("/details/<int:id>")
+def application_details(id):
+
+    conn = sqlite3.connect("jobtrack.db")
+    conn.row_factory = sqlite3.Row
+
+    application = conn.execute(
+        "SELECT * FROM applications WHERE id = ?",
+        (id,)
+    ).fetchone()
+
+    conn.close()
+
+    return render_template(
+        "details.html",
+        application=application
+    )
+
+
 
 @app.route("/notes/<int:id>", methods=["GET", "POST"])
 def view_notes(id):
@@ -89,17 +130,38 @@ def add_application():
     status = request.form["status"]
     date = request.form["date"]
     notes = request.form["notes"]
+    interview_date = request.form.get("interview_date", "")
+    interview_time = request.form.get("interview_time", "")
+    interview_type = request.form.get("interview_type", "")
 
     conn = sqlite3.connect("jobtrack.db")
 
     conn.execute(
-        """
-        INSERT INTO applications
-        (company, role, status, date, notes)
-        VALUES (?, ?, ?, ?, ?)
-        """,
-        (company, role, status, date, notes)
+    """
+    INSERT INTO applications
+    (
+        company,
+        role,
+        status,
+        date,
+        notes,
+        interview_date,
+        interview_time,
+        interview_type
     )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """,
+    (
+        company,
+        role,
+        status,
+        date,
+        notes,
+        interview_date,
+        interview_time,
+        interview_type
+    )
+)
 
     conn.commit()
     conn.close()

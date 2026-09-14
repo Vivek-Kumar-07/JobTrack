@@ -78,6 +78,67 @@
                    placeholder="Add notes about this application..."
                  >{{ application['notes'] or '' }}</textarea>
 
+                <!-- Interview Details -->
+
+{% if application['status'] == 'Interview' %}
+
+<div class="interview-section">
+
+    <h3>Interview Details</h3>
+
+    <label>Interview Date</label>
+
+    <input
+        type="date"
+        name="interview_date"
+        value="{{ application['interview_date'] or '' }}"
+    >
+
+    <label>Interview Time</label>
+
+    <input
+        type="time"
+        name="interview_time"
+        value="{{ application['interview_time'] or '' }}"
+    >
+
+    <label>Interview Type</label>
+
+    <select name="interview_type">
+
+        <option value="">Select interview type</option>
+
+        <option value="Online"
+            {% if application['interview_type'] == 'Online' %}selected{% endif %}>
+            Online
+        </option>
+
+        <option value="Phone"
+            {% if application['interview_type'] == 'Phone' %}selected{% endif %}>
+            Phone
+        </option>
+
+        <option value="Technical"
+            {% if application['interview_type'] == 'Technical' %}selected{% endif %}>
+            Technical
+        </option>
+
+        <option value="HR"
+            {% if application['interview_type'] == 'HR' %}selected{% endif %}>
+            HR
+        </option>
+
+        <option value="In-person"
+            {% if application['interview_type'] == 'In-person' %}selected{% endif %}>
+            In-person
+        </option>
+
+    </select>
+
+</div>
+
+{% endif %}
+
             <div class="edit-buttons">
 
                 <button type="submit">

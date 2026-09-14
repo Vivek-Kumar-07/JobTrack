@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Application Details - JobTrack</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            JobTrack
+        </div>
+
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/#add-application">Add Application</a>
+        </div>
+
+    </nav>
+
+
+    <div class="container">
+
+        <h1>Application Details</h1>
+
+        <div class="details-card">
+
+            <h2>{{ application["company"] }}</h2>
+
+            <div class="detail-row">
+                <strong>Job Role</strong>
+                <span>{{ application["role"] }}</span>
+            </div>
+
+            <div class="detail-row">
+                <strong>Status</strong>
+
+                <span class="status {{ application['status']|lower }}">
+                    {{ application["status"] }}
+                </span>
+            </div>
+
+            <div class="detail-row">
+                <strong>Application Date</strong>
+                <span>{{ application["date"] }}</span>
+            </div>
+
+            <div class="detail-row">
+                <strong>Notes</strong>
+
+                <span>
+                    {% if application["notes"] %}
+                        {{ application["notes"] }}
+                    {% else %}
+                        No notes added.
+                    {% endif %}
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="details-buttons">
+
+            <a class="action edit"
+               href="/edit/{{ application['id'] }}">
+                Edit Application
+            </a>
+
+            <a class="back-button"
+               href="/">
+                ← Back to Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
