@@ -567,3 +567,82 @@ textarea {
     margin-bottom: 20px;
     font-size: 20px;
 }
+
+/* Next Follow-ups */
+
+.follow-up-section {
+    margin: 25px 0 40px;
+}
+
+.follow-up-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    align-items: center;
+    gap: 20px;
+
+    background: white;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+.follow-up-card a {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.follow-up-card.overdue {
+    border-left: 5px solid #dc2626;
+}
+
+.follow-up-card.today {
+    border-left: 5px solid #f59e0b;
+}
+
+.follow-up-card.upcoming {
+    border-left: 5px solid #16a34a;
+}
+
+.follow-up-section h3 {
+    margin-top: 25px;
+    margin-bottom: 12px;
+}
+
+
+/* Status History */
+
+.status-history {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-top: 25px;
+}
+
+.status-history h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.history-item {
+    position: relative;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-left: 4px solid #2563eb;
+    background: #f9fafb;
+    border-radius: 6px;
+}
+
+.history-status {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.history-date {
+    margin-top: 5px;
+    color: #6b7280;
+    font-size: 14px;
+}

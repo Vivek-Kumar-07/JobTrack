@@ -154,6 +154,101 @@
 
 </div>
 
+<!-- Next Follow-ups -->
+
+<h2>Next Follow-ups</h2>
+
+<div class="follow-up-section">
+
+    {% if overdue_followups %}
+
+    <h3>🔴 Overdue</h3>
+
+    {% for application in overdue_followups %}
+
+    <div class="follow-up-card overdue">
+
+        <strong>{{ application["company"] }}</strong>
+
+        <span>{{ application["role"] }}</span>
+
+        <span>
+            Follow-up: {{ application["follow_up_date"] }}
+        </span>
+
+        <a href="/details/{{ application['id'] }}">
+            View
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+    {% endif %}
+
+
+    {% if today_followups %}
+
+    <h3>🟡 Due Today</h3>
+
+    {% for application in today_followups %}
+
+    <div class="follow-up-card today">
+
+        <strong>{{ application["company"] }}</strong>
+
+        <span>{{ application["role"] }}</span>
+
+        <span>
+            Follow-up: TODAY
+        </span>
+
+        <a href="/details/{{ application['id'] }}">
+            View
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+    {% endif %}
+
+
+    {% if upcoming_followups %}
+
+    <h3>🟢 Upcoming</h3>
+
+    {% for application in upcoming_followups %}
+
+    <div class="follow-up-card upcoming">
+
+        <strong>{{ application["company"] }}</strong>
+
+        <span>{{ application["role"] }}</span>
+
+        <span>
+            Follow-up: {{ application["follow_up_date"] }}
+        </span>
+
+        <a href="/details/{{ application['id'] }}">
+            View
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+    {% endif %}
+
+
+    {% if not overdue_followups and not today_followups and not upcoming_followups %}
+
+        <p>No follow-ups scheduled.</p>
+
+    {% endif %}
+
+</div>
+
 <h2>Search & Filter</h2>
 
 <form method="GET" action="/">
@@ -328,8 +423,31 @@
         </select>
 
     </div>
-
 </div>
+
+<label>Next Follow-up</label>
+
+<input
+    type="date"
+    name="follow_up_date"
+>
+
+<label>Company Website</label>
+
+<input
+    type="url"
+    name="company_url"
+    placeholder="https://company.com"
+>
+
+
+<label>Job Posting URL</label>
+
+<input
+    type="url"
+    name="job_url"
+    placeholder="https://company.com/jobs/..."
+>
 
 <button type="submit">
     Add Application

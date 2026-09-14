@@ -139,6 +139,33 @@
 
 {% endif %}
 
+<label>Next Follow-up</label>
+
+<input
+    type="date"
+    name="follow_up_date"
+    value="{{ application['follow_up_date'] or '' }}"
+
+    <label>Company Website</label>
+
+<input
+    type="url"
+    name="company_url"
+    value="{{ application['company_url'] or '' }}"
+    placeholder="https://company.com"
+>
+
+
+<label>Job Posting URL</label>
+
+<input
+    type="url"
+    name="job_url"
+    value="{{ application['job_url'] or '' }}"
+    placeholder="https://company.com/jobs/..."
+>
+
+
             <div class="edit-buttons">
 
                 <button type="submit">

@@ -63,8 +63,122 @@
                 </span>
             </div>
 
+                {% if application["status"] == "Interview" %}
+
+            <div class="detail-row">
+                <strong>Interview Date</strong>
+
+                <span>
+                    {% if application["interview_date"] %}
+                        {{ application["interview_date"] }}
+                    {% else %}
+                        Not scheduled
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="detail-row">
+                <strong>Interview Time</strong>
+
+                <span>
+                    {% if application["interview_time"] %}
+                        {{ application["interview_time"] }}
+                    {% else %}
+                        Not scheduled
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="detail-row">
+                <strong>Interview Type</strong>
+
+                <span>
+                    {% if application["interview_type"] %}
+                        {{ application["interview_type"] }}
+                    {% else %}
+                        Not specified
+                    {% endif %}
+                </span>
+            </div>
+
+            {% endif %}
+
+            {% if application["follow_up_date"] %}
+
+            <div class="detail-row">
+        <strong>Next Follow-up</strong>
+
+        <span>
+            {{ application["follow_up_date"] }}
+        </span>
+    </div>
+
+{% endif %}
+
+{% if application["company_url"] %}
+
+<div class="detail-row">
+    <strong>Company Website</strong>
+
+    <span>
+        <a href="{{ application['company_url'] }}"
+           target="_blank">
+            Visit Company Website
+        </a>
+    </span>
+</div>
+
+{% endif %}
+
+
+{% if application["job_url"] %}
+
+<div class="detail-row">
+    <strong>Job Posting</strong>
+
+    <span>
+        <a href="{{ application['job_url'] }}"
+           target="_blank">
+            View Job Posting
+        </a>
+    </span>
+</div>
+
+{% endif %}
+
+        </div>
+    
+    <!-- Status History -->
+
+<div class="status-history">
+
+    <h2>Status History</h2>
+
+    {% if status_history %}
+
+        {% for history in status_history %}
+
+        <div class="history-item">
+
+            <div class="history-status">
+                {{ history["status"] }}
+            </div>
+
+            <div class="history-date">
+                {{ history["changed_at"] }}
+            </div>
+
         </div>
 
+        {% endfor %}
+
+    {% else %}
+
+        <p>No status changes recorded yet.</p>
+
+    {% endif %}
+
+</div>
 
         <div class="details-buttons">
 
