@@ -3,9 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JobTrack</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -15,20 +17,20 @@
     <div class="logo">
         JobTrack
     </div>
-
+        
     <div class="nav-links">
 
-        <a href="/">Dashboard</a>
+    <a href="/">Dashboard</a>
 
-        <a href="#add-application">Add Application</a>
+    <a href="#add-application">Add Application</a>
 
-        <span>Welcome, {{ session["username"] }}</span>
+    <a href="/profile">Profile</a>
 
-        <a href="/logout">Logout</a>
+    <span>Welcome, {{ session["username"] }}</span>
 
-    </div>
+    <a href="/logout">Logout</a>
 
-</nav>
+</div>
 
 </nav>
 
@@ -163,6 +165,20 @@
 
 </div>
 
+<!-- Interactive Application Chart -->
+
+<div class="chart-section">
+
+    <h2>Application Status</h2>
+
+    <div class="chart-card">
+
+    <canvas id="applicationChart"></canvas>
+
+     </div>
+
+</div>
+
 <!-- Next Follow-ups -->
 
 <h2>Next Follow-ups</h2>
@@ -260,74 +276,125 @@
 
 <h2>Search & Filter</h2>
 
-<form method="GET" action="/">
+<form method="GET" action="/" class="search-form">
 
-    <input
-        type="text"
-        name="search"
-        placeholder="Search company or role..."
-        value="{{ search }}"
-    >
+    <div class="search-main">
 
-    <select name="status">
+        <input
+            type="text"
+            name="search"
+            placeholder="Search company or role..."
+            value="{{ search }}"
+        >
 
-        <option value="">All Statuses</option>
+    </div>
 
-        <option value="Applied"
-            {% if status == "Applied" %}selected{% endif %}>
-            Applied
-        </option>
 
-        <option value="Interview"
-            {% if status == "Interview" %}selected{% endif %}>
-            Interview
-        </option>
+    <div class="filter-row">
 
-        <option value="Rejected"
-            {% if status == "Rejected" %}selected{% endif %}>
-            Rejected
-        </option>
+       <div class="filter-group">
 
-        <option value="Offer"
-            {% if status == "Offer" %}selected{% endif %}>
-            Offer
-        </option>
+        <label>Status</label>
 
-    </select>
+        <select name="status">
+ 
+            <option value="">All Statuses</option>
 
-    <label>Sort By</label>
+            <option value="Applied"
+                {% if status == "Applied" %}selected{% endif %}>
+                Applied
+            </option>
 
-<select name="sort">
+            <option value="Interview"
+                {% if status == "Interview" %}selected{% endif %}>
+                Interview
+            </option>
 
-    <option value="newest"
-        {% if sort == "newest" %}selected{% endif %}>
-        Newest First
-    </option>
+            <option value="Rejected"
+                {% if status == "Rejected" %}selected{% endif %}>
+                Rejected
+            </option>
 
-    <option value="oldest"
-        {% if sort == "oldest" %}selected{% endif %}>
-        Oldest First
-    </option>
+            <option value="Offer"
+                {% if status == "Offer" %}selected{% endif %}>
+                Offer
+            </option>
 
-    <option value="company_asc"
-        {% if sort == "company_asc" %}selected{% endif %}>
-        Company A → Z
-    </option>
+        </select>
 
-    <option value="company_desc"
-        {% if sort == "company_desc" %}selected{% endif %}>
-        Company Z → A
-    </option>
+    </div>
 
-</select>
 
-    <button type="submit">
-        Search
-    </button>
+    <div class="filter-group">
 
-    <a href="/">
-        Clear
-    </a>
+        <label>From Date</label>
+
+        <input
+            type="date"
+            name="from_date"
+            value="{{ from_date }}"
+        >
+
+    </div>
+
+
+    <div class="filter-group">
+
+        <label>To Date</label>
+
+        <input
+            type="date"
+            name="to_date"
+            value="{{ to_date }}"
+        >
+
+    </div>
+
+
+    <div class="filter-group">
+
+        <label>Sort By</label>
+
+        <select name="sort">
+
+            <option value="newest"
+                {% if sort == "newest" %}selected{% endif %}>
+                Newest First
+            </option>
+
+            <option value="oldest"
+                {% if sort == "oldest" %}selected{% endif %}>
+                Oldest First
+            </option>
+
+            <option value="company_asc"
+                {% if sort == "company_asc" %}selected{% endif %}>
+                Company A → Z
+            </option>
+
+            <option value="company_desc"
+                {% if sort == "company_desc" %}selected{% endif %}>
+                Company Z → A
+            </option>
+
+        </select>
+
+    </div>
+
+</div>
+
+
+    <div class="search-actions">
+
+        <button type="submit">
+            Search
+        </button>
+
+        <a href="/">
+            Clear
+        </a>
+
+    </div>
 
 </form>
 
@@ -517,8 +584,67 @@
 
         {% endfor %}
 
-    </table>
+</table>
+
 </div>
+
+
+<script>
+
+    const ctx = document.getElementById("applicationChart");
+
+    new Chart(ctx, {
+        type: "doughnut",
+
+        data: {
+            labels: [
+                "Applied",
+                "Interviews",
+                "Rejected",
+                "Offers"
+            ],
+
+            datasets: [{
+                data: [
+                    {{ applied }},
+                    {{ interviews }},
+                    {{ rejected }},
+                    {{ offers }}
+                ]
+            }]
+        },
+
+        options: {
+    responsive: true,
+    maintainAspectRatio: false,
+
+    plugins: {
+        tooltip: {
+            callbacks: {
+                label: function(context) {
+
+                    const value = context.raw;
+
+                    const total = context.dataset.data.reduce(
+                        (sum, value) => sum + value,
+                        0
+                    );
+
+                    const percentage = total
+                        ? ((value / total) * 100).toFixed(1)
+                        : 0;
+
+                    return context.label + ": " + value +
+                           " (" + percentage + "%)";
+                }
+            }
+        }
+    }
+}
+      });
+
+</script>
+
 </body>
 
 </html>

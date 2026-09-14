@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>Profile - JobTrack</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="logo">
+            JobTrack
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">Dashboard</a>
+
+            <a href="/#add-application">Add Application</a>
+
+            <a href="/profile">Profile</a>
+
+            <span>Welcome, {{ session["username"] }}</span>
+
+            <a href="/logout">Logout</a>
+
+        </div>
+
+    </nav>
+
+    <div class="container">
+
+        <h1>My Profile</h1>
+
+        <div class="notes-card">
+
+            <h2>Account Information</h2>
+
+            <p>
+                <strong>Username:</strong>
+                {{ user["username"] }}
+            </p>
+
+            <p>
+                <strong>Email:</strong>
+                {{ user["email"] }}
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

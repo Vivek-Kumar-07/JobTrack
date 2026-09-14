@@ -90,6 +90,31 @@ def logout():
 
     return redirect("/login")
 
+@app.route("/profile")
+def profile():
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    conn = sqlite3.connect("jobtrack.db")
+    conn.row_factory = sqlite3.Row
+
+    user = conn.execute(
+        """
+        SELECT username, email
+        FROM users
+        WHERE id = ?
+        """,
+        (session["user_id"],)
+    ).fetchone()
+
+    conn.close()
+
+    return render_template(
+        "profile.html",
+        user=user
+    )
+
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
 def edit_application(id):
     if "user_id" not in session:
@@ -193,7 +218,7 @@ def edit_application(id):
 
     if application is None:
         conn.close()
-        return "Application not found.", 404
+        return render_template("404.html"), 404
 
     conn.close()
 
@@ -222,7 +247,7 @@ def application_details(id):
 
     if application is None:
         conn.close()
-        return "Application not found.", 404
+        return render_template("404.html"), 404
 
     status_history = conn.execute(
     """
@@ -280,7 +305,7 @@ def view_notes(id):
 
     if application is None:
         conn.close()
-        return "Application not found.", 404
+        return render_template("404.html"), 404
 
     conn.close()
 
@@ -395,6 +420,8 @@ def home():
     search = request.args.get("search", "")
     status = request.args.get("status", "")
     sort = request.args.get("sort", "newest")
+    from_date = request.args.get("from_date", "")
+    to_date = request.args.get("to_date", "")
 
     conn = sqlite3.connect("jobtrack.db")
     conn.row_factory = sqlite3.Row
@@ -412,6 +439,15 @@ def home():
     if status:
         query += " AND status = ?"
         params.append(status)
+
+    # Filter by date range
+    if from_date:
+        query += " AND date >= ?"
+        params.append(from_date)
+
+    if to_date:
+       query += " AND date <= ?"
+       params.append(to_date)
 
     # Sorting
     if sort == "oldest":
@@ -492,20 +528,26 @@ def home():
     conn.close()
 
     return render_template(
-        "index.html",
-        applications=applications,
-        total=total,
-        applied=applied,
-        interviews=interviews,
-        rejected=rejected,
-        offers=offers,
-        search=search,
-        status=status,
-        sort=sort,
-        overdue_followups=overdue_followups,
-        today_followups=today_followups,
-        upcoming_followups=upcoming_followups
-    )
+    "index.html",
+    applications=applications,
+    total=total,
+    applied=applied,
+    interviews=interviews,
+    rejected=rejected,
+    offers=offers,
+    search=search,
+    status=status,
+    sort=sort,
+    from_date=from_date,
+    to_date=to_date,
+    overdue_followups=overdue_followups,
+    today_followups=today_followups,
+    upcoming_followups=upcoming_followups
+)
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
 
 if __name__ == "__main__":
     app.run(debug=True)
