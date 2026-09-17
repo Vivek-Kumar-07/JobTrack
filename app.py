@@ -9,8 +9,11 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get("SECRET_KEY")
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE = os.path.join(BASE_DIR, "jobtrack.db")
+
 def get_db_connection():
-    conn = sqlite3.connect("jobtrack.db")
+    conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -25,7 +28,7 @@ def signup():
 
         hashed_password = generate_password_hash(password)
 
-        conn = sqlite3.connect("jobtrack.db")
+        conn = sqlite3.connect(DATABASE)
 
         try:
 
@@ -63,7 +66,7 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
 
-        conn = sqlite3.connect("jobtrack.db")
+        conn = sqlite3.connect(DATABASE)
         conn.row_factory = sqlite3.Row
 
         user = conn.execute(
@@ -98,7 +101,7 @@ def profile():
     if "user_id" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("jobtrack.db")
+    conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
 
     user = conn.execute(
@@ -122,7 +125,7 @@ def edit_application(id):
     if "user_id" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("jobtrack.db")
+    conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
 
     if request.method == "POST":
@@ -234,7 +237,7 @@ def application_details(id):
     if "user_id" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("jobtrack.db")
+    conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
 
     application = conn.execute(
@@ -276,7 +279,7 @@ def view_notes(id):
     if "user_id" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("jobtrack.db")
+    conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
 
     if request.method == "POST":
@@ -335,8 +338,7 @@ def add_application():
 
     user_id = session["user_id"]
 
-    conn = sqlite3.connect("jobtrack.db")
-
+    conn = sqlite3.connect(DATABASE)
     cursor = conn.execute(
     """
     INSERT INTO applications
@@ -395,7 +397,7 @@ def delete_application(id):
     if "user_id" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("jobtrack.db")
+    conn =sqlite3.connect(DATABASE)
 
     conn.execute(
         """
@@ -425,7 +427,7 @@ def home():
     from_date = request.args.get("from_date", "")
     to_date = request.args.get("to_date", "")
 
-    conn = sqlite3.connect("jobtrack.db")
+    conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
 
     query = "SELECT * FROM applications WHERE user_id = ?"
@@ -602,7 +604,7 @@ def export_csv():
 
     user_id = session["user_id"]
 
-    conn = sqlite3.connect("jobtrack.db")
+    conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
 
     applications = conn.execute(
