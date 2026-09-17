@@ -24,9 +24,21 @@ def signup():
 
     if request.method == "POST":
 
-        username = request.form["username"]
-        email = request.form["email"]
+        username = request.form["username"].strip()
+        email = request.form["email"].strip().lower()
         password = request.form["password"]
+
+        if not username or not email or not password:
+            flash("All fields are required.", "error")
+            return redirect("/signup")
+
+        if len(password) < 8:
+            flash("Password must be at least 8 characters long.", "error")
+            return redirect("/signup")
+
+        if "@" not in email or "." not in email:
+            flash("Please enter a valid email address.", "error")
+            return redirect("/signup")
 
         hashed_password = generate_password_hash(password)
 
