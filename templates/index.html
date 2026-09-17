@@ -42,6 +42,7 @@
 
 
 <h2>Dashboard</h2>
+<a href="/export" class="export-btn">Export Applications as CSV</a>
 
 <div class="dashboard">
 
@@ -178,6 +179,73 @@
      </div>
 
 </div>
+
+<section class="chart-section">
+    <div class="chart-card">
+        <h2>📊 Monthly Application Analytics</h2>
+        <canvas id="applicationsOverTimeChart"></canvas>
+    </div>
+</section>
+
+<section class="monthly-summary-section">
+
+    <h2>Monthly Performance</h2>
+
+    <div class="monthly-summary-grid">
+
+        {% for item in monthly_analytics %}
+
+        <div class="monthly-summary-card">
+
+            <h3>
+                {{ item["month_label"] }}
+            </h3>
+
+            <div class="monthly-metrics">
+
+                <div class="monthly-metric">
+                    <span>Applications</span>
+                    <strong>{{ item["applications"] }}</strong>
+                </div>
+
+                <div class="monthly-metric">
+                    <span>Interviews</span>
+                    <strong>{{ item["interviews"] }}</strong>
+                </div>
+
+                <div class="monthly-metric">
+                    <span>Offers</span>
+                    <strong>{{ item["offers"] }}</strong>
+                </div>
+
+                <div class="monthly-metric">
+                    <span>Rejected</span>
+                    <strong>{{ item["rejected"] }}</strong>
+                </div>
+
+            </div>
+
+            <div class="monthly-rates">
+
+                <div>
+                    <span>Interview Rate</span>
+                    <strong>{{ item["interview_rate"] }}%</strong>
+                </div>
+
+                <div>
+                    <span>Offer Rate</span>
+                    <strong>{{ item["offer_rate"] }}%</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
 
 <!-- Next Follow-ups -->
 
@@ -643,6 +711,113 @@
 }
       });
 
+</script>
+
+<script>
+    const timeCtx = document.getElementById("applicationsOverTimeChart");
+
+    new Chart(timeCtx, {
+        type: "line",
+
+        data: {
+            labels: [
+                {% for item in monthly_analytics %}
+                    "{{ item['month'] }}",
+                {% endfor %}
+            ].map(function(month) {
+
+                const [year, monthNumber] = month.split("-");
+
+                const monthNames = [
+                    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                ];
+
+                return monthNames[parseInt(monthNumber) - 1] + " " + year;
+            }),
+
+            datasets: [
+                {
+                    label: "Applications",
+                    data: [
+                        {% for item in monthly_analytics %}
+                            {{ item['applications'] }},
+                        {% endfor %}
+                    ],
+                    tension: 0.3
+                },
+
+                {
+                    label: "Interviews",
+                    data: [
+                        {% for item in monthly_analytics %}
+                            {{ item['interviews'] }},
+                        {% endfor %}
+                    ],
+                    tension: 0.3
+                },
+
+                {
+                    label: "Offers",
+                    data: [
+                        {% for item in monthly_analytics %}
+                            {{ item['offers'] }},
+                        {% endfor %}
+                    ],
+                    tension: 0.3
+                },
+
+                {
+                    label: "Rejected",
+                    data: [
+                        {% for item in monthly_analytics %}
+                            {{ item['rejected'] }},
+                        {% endfor %}
+                    ],
+                    tension: 0.3
+                }
+            ]
+        },
+
+            options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        interaction: {
+            mode: "index",
+            intersect: false
+        },
+
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItems) {
+                        return tooltipItems[0].label;
+                    },
+
+                    label: function(context) {
+                        return context.dataset.label + ": " + context.raw;
+                    }
+                }
+            }
+        },
+
+        scales: {
+            y: {
+                beginAtZero: true,
+
+                title: {
+                    display: true,
+                    text: "Number of Applications"
+                },
+
+                ticks: {
+                    precision: 0
+                }
+            }
+        }
+    }
+ });
 </script>
 
 </body>

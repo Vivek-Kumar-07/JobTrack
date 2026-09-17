@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, Response
 import sqlite3
 import os
-from datetime import date
+import csv
+from datetime import date, datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -526,6 +527,52 @@ def home():
     (user_id,)
     ).fetchone()[0]
 
+    # Monthly Application Analytics
+
+    monthly_analytics = conn.execute(
+        """
+        SELECT
+            strftime('%Y-%m', date) AS month,
+
+            COUNT(*) AS applications,
+
+            SUM(CASE WHEN status = 'Interview' THEN 1 ELSE 0 END) AS interviews,
+
+            SUM(CASE WHEN status = 'Offer' THEN 1 ELSE 0 END) AS offers,
+
+            SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) AS rejected
+
+        FROM applications
+
+        WHERE user_id = ?
+
+        GROUP BY month
+
+        ORDER BY month ASC
+        """,
+        (user_id,)
+    ).fetchall()
+
+    monthly_analytics = [
+    {
+        "month": item["month"],
+        "month_label": datetime.strptime(
+            item["month"], "%Y-%m"
+        ).strftime("%B %Y"),
+        "applications": item["applications"],
+        "interviews": item["interviews"],
+        "offers": item["offers"],
+        "rejected": item["rejected"],
+            "interview_rate": round(
+                (item["interviews"] / item["applications"]) * 100, 1
+            ) if item["applications"] else 0,
+            "offer_rate": round(
+                (item["offers"] / item["applications"]) * 100, 1
+            ) if item["applications"] else 0
+        }
+        for item in monthly_analytics
+    ]
+
     conn.close()
 
     return render_template(
@@ -536,6 +583,7 @@ def home():
     interviews=interviews,
     rejected=rejected,
     offers=offers,
+    monthly_analytics=monthly_analytics,
     search=search,
     status=status,
     sort=sort,
@@ -545,6 +593,81 @@ def home():
     today_followups=today_followups,
     upcoming_followups=upcoming_followups
 )
+
+@app.route("/export")
+def export_csv():
+
+    if "user_id" not in session:
+        return redirect("/login")
+
+    user_id = session["user_id"]
+
+    conn = sqlite3.connect("jobtrack.db")
+    conn.row_factory = sqlite3.Row
+
+    applications = conn.execute(
+        """
+        SELECT company, role, status, date, notes,
+               interview_date, interview_time,
+               interview_type, follow_up_date,
+               company_url, job_url
+        FROM applications
+        WHERE user_id = ?
+        ORDER BY date DESC
+        """,
+        (user_id,)
+    ).fetchall()
+
+    conn.close()
+
+    output = []
+
+    headers = [
+        "Company",
+        "Role",
+        "Status",
+        "Date",
+        "Notes",
+        "Interview Date",
+        "Interview Time",
+        "Interview Type",
+        "Follow-up Date",
+        "Company URL",
+        "Job URL"
+    ]
+
+    output.append(headers)
+
+    for application in applications:
+        output.append([
+            application["company"],
+            application["role"],
+            application["status"],
+            application["date"],
+            application["notes"],
+            application["interview_date"],
+            application["interview_time"],
+            application["interview_type"],
+            application["follow_up_date"],
+            application["company_url"],
+            application["job_url"]
+        ])
+
+    csv_data = ""
+
+    for row in output:
+        csv_data += ",".join(
+            '"' + str(value or "").replace('"', '""') + '"'
+            for value in row
+        ) + "\n"
+
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={
+            "Content-Disposition": "attachment; filename=jobtrack_applications.csv"
+        }
+    )
 
 @app.errorhandler(404)
 def page_not_found(error):
