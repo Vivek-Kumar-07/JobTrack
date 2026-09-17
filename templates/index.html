@@ -28,7 +28,9 @@
 
     <span>Welcome, {{ session["username"] }}</span>
 
-    <a href="/logout">Logout</a>
+    <form action="/logout" method="POST" style="display: inline;">
+    <button type="submit">Logout</button>
+    </form>
 
 </div>
 
