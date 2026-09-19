@@ -164,6 +164,16 @@ def edit_application(id):
         role = request.form["role"]
         status = request.form["status"]
         date = request.form["date"]
+        try:
+            application_date = datetime.strptime(date, "%Y-%m-%d").date()
+
+            if application_date > datetime.today().date():
+                flash("Application date cannot be in the future.", "error")
+                return redirect("/")
+
+        except ValueError:
+            flash("Please enter a valid application date.", "error")
+            return redirect("/")
         notes = request.form["notes"]
         interview_date = request.form.get("interview_date", "")
         interview_time = request.form.get("interview_time", "")
