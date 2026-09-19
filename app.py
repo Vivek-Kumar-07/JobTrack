@@ -25,7 +25,7 @@ def signup():
     if request.method == "POST":
 
         username = request.form["username"].strip()
-        email = request.form["email"].strip().lower()
+        email = request.form["email"].strip().lower()   
         password = request.form["password"]
 
         if not username or not email or not password:
