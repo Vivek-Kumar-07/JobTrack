@@ -172,6 +172,14 @@ def edit_application(id):
         company_url = request.form.get("company_url", "")
         job_url = request.form.get("job_url", "")
 
+        if company_url and not company_url.startswith(("http://", "https://")):
+            flash("Company URL must start with http:// or https://.", "error")
+            return redirect("/")
+
+        if job_url and not job_url.startswith(("http://", "https://")):
+            flash("Job URL must start with http:// or https://.", "error")
+            return redirect("/")
+
         conn.execute(
             """
             UPDATE applications
