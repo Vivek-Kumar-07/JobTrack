@@ -689,5 +689,9 @@ def export_csv():
 def page_not_found(error):
     return render_template("404.html"), 404
 
+@app.errorhandler(500)
+def internal_server_error(error):
+    return "Something went wrong. Please try again later.", 500
+
 if __name__ == "__main__":
     app.run(debug=False)
