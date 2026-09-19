@@ -174,6 +174,16 @@ def edit_application(id):
 
         if company_url and not company_url.startswith(("http://", "https://")):
             flash("Company URL must start with http:// or https://.", "error")
+            conn.close()
+            return redirect(f"/edit/{id}")
+
+        if job_url and not job_url.startswith(("http://", "https://")):
+            flash("Job URL must start with http:// or https://.", "error")
+            conn.close()
+            return redirect(f"/edit/{id}")
+
+        if company_url and not company_url.startswith(("http://", "https://")):
+            flash("Company URL must start with http:// or https://.", "error")
             return redirect("/")
 
         if job_url and not job_url.startswith(("http://", "https://")):
