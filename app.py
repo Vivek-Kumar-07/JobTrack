@@ -28,6 +28,19 @@ def validate_urls(company_url, job_url):
 
     return None
 
+def validate_application_date(application_date):
+    try:
+        parsed_date = datetime.strptime(
+            application_date, "%Y-%m-%d"
+        ).date()
+    except ValueError:
+        return "Please enter a valid application date."
+
+    if parsed_date > datetime.today().date():
+        return "Application date cannot be in the future."
+
+    return None
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
 
@@ -173,16 +186,13 @@ def edit_application(id):
         role = request.form["role"]
         status = request.form["status"]
         date = request.form["date"]
-        try:
-            application_date = datetime.strptime(date, "%Y-%m-%d").date()
 
-            if application_date > datetime.today().date():
-                flash("Application date cannot be in the future.", "error")
-                return redirect("/")
+        date_error = validate_application_date(date)
 
-        except ValueError:
-            flash("Please enter a valid application date.", "error")
+        if date_error:
+            flash(date_error, "error")
             return redirect("/")
+
         notes = request.form["notes"]
         interview_date = request.form.get("interview_date", "")
         interview_time = request.form.get("interview_time", "")
@@ -368,6 +378,11 @@ def add_application():
     role = request.form["role"]
     status = request.form["status"]
     date = request.form["date"]
+    date_error = validate_application_date(date)
+
+    if date_error:
+        flash(date_error, "error")
+        return redirect("/#add-application")
     notes = request.form["notes"]
     interview_date = request.form.get("interview_date", "")
     interview_time = request.form.get("interview_time", "")
