@@ -19,6 +19,15 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def validate_urls(company_url, job_url):
+    if company_url and not company_url.startswith(("http://", "https://")):
+        return "Company URL must start with http:// or https://."
+
+    if job_url and not job_url.startswith(("http://", "https://")):
+        return "Job URL must start with http:// or https://."
+
+    return None
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
 
@@ -182,23 +191,12 @@ def edit_application(id):
         company_url = request.form.get("company_url", "")
         job_url = request.form.get("job_url", "")
 
-        if company_url and not company_url.startswith(("http://", "https://")):
-            flash("Company URL must start with http:// or https://.", "error")
+        url_error = validate_urls(company_url, job_url)
+
+        if url_error:
+            flash(url_error, "error")
             conn.close()
             return redirect(f"/edit/{id}")
-
-        if job_url and not job_url.startswith(("http://", "https://")):
-            flash("Job URL must start with http:// or https://.", "error")
-            conn.close()
-            return redirect(f"/edit/{id}")
-
-        if company_url and not company_url.startswith(("http://", "https://")):
-            flash("Company URL must start with http:// or https://.", "error")
-            return redirect("/")
-
-        if job_url and not job_url.startswith(("http://", "https://")):
-            flash("Job URL must start with http:// or https://.", "error")
-            return redirect("/")
 
         conn.execute(
             """
@@ -377,6 +375,11 @@ def add_application():
     follow_up_date = request.form.get("follow_up_date", "")
     company_url = request.form.get("company_url", "")
     job_url = request.form.get("job_url", "")
+    url_error = validate_urls(company_url, job_url)
+
+    if url_error:
+        flash(url_error, "error")
+        return redirect("/#add-application")
 
     user_id = session["user_id"]
 
