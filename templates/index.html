@@ -638,11 +638,16 @@
         Edit
     </a>
 
-    <a class="action delete"
-       href="/delete/{{ application['id'] }}"
-       onclick="return confirm('Are you sure you want to delete this application?');">
-        Delete
-    </a>
+    <form action="/delete/{{ application['id'] }}"
+        method="POST"
+        style="display: inline;"
+        onsubmit="return confirm('Are you sure you want to delete this application?');">
+
+        <button type="submit" class="action delete">
+            Delete
+        </button>
+
+    </form>
 
     <a class="action notes"
        href="/notes/{{ application['id'] }}">

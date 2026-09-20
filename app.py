@@ -434,7 +434,7 @@ def add_application():
 
     return redirect("/")
 
-@app.route("/delete/<int:id>")
+@app.route("/delete/<int:id>", methods=["POST"])
 def delete_application(id):
     if "user_id" not in session:
         return redirect("/login")
