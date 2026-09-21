@@ -1,7 +1,11 @@
 import sqlite3
+import os
 
 
-conn = sqlite3.connect("jobtrack.db")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE = os.path.join(BASE_DIR, "jobtrack.db")
+
+conn = sqlite3.connect(DATABASE)
 
 # Create applications table if it doesn't exist
 conn.execute("""
