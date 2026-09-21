@@ -189,6 +189,7 @@ def edit_application(id):
 
         if date_error:
             flash(date_error, "error")
+            conn.close()
             return redirect("/")
 
         notes = request.form["notes"]
@@ -239,7 +240,6 @@ def edit_application(id):
                 session["user_id"]
             )
         )
-
         # Record status change
 
         if old_status != status:
@@ -288,13 +288,13 @@ def application_details(id):
     conn = get_db_connection()
 
     application = conn.execute(
-    """
-    SELECT *
-    FROM applications
-    WHERE id = ?
-    AND user_id = ?
-    """,
-    (id, session["user_id"])
+        """
+        SELECT *
+        FROM applications
+        WHERE id = ?
+        AND user_id = ?
+        """,
+        (id, session["user_id"])
     ).fetchone()
 
     if application is None:
@@ -302,13 +302,13 @@ def application_details(id):
         return render_template("404.html"), 404
 
     status_history = conn.execute(
-    """
-    SELECT *
-    FROM status_history
-    WHERE application_id = ?
-    ORDER BY changed_at DESC
-    """,
-    (id,)
+        """
+        SELECT *
+        FROM status_history
+        WHERE application_id = ?
+        ORDER BY changed_at DESC
+        """,
+        (id,)
     ).fetchall()
 
     conn.close()
@@ -319,6 +319,57 @@ def application_details(id):
         status_history=status_history
     )
 
+@app.route("/delete/<int:id>", methods=["POST"])
+def delete_application(id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    conn = get_db_connection()
+
+    try:
+        application = conn.execute(
+            """
+            SELECT id
+            FROM applications
+            WHERE id = ?
+            AND user_id = ?
+            """,
+            (id, session["user_id"])
+        ).fetchone()
+
+        if application is None:
+            conn.close()
+            return render_template("404.html"), 404
+
+        # Delete status history first because it references the application
+        conn.execute(
+            """
+            DELETE FROM status_history
+            WHERE application_id = ?
+            """,
+            (id,)
+        )
+
+        # Delete the application
+        conn.execute(
+            """
+            DELETE FROM applications
+            WHERE id = ?
+            AND user_id = ?
+            """,
+            (id, session["user_id"])
+        )
+
+        conn.commit()
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        conn.close()
+
+    return redirect("/")
 
 
 @app.route("/notes/<int:id>", methods=["GET", "POST"])
@@ -429,7 +480,6 @@ def add_application():
         user_id
     )
 )
-
     # Record initial status
 
     application_id = cursor.lastrowid
@@ -441,27 +491,6 @@ def add_application():
         VALUES (?, ?, datetime('now'))
         """,
         (application_id, status)
-    )
-
-    conn.commit()
-    conn.close()
-
-    return redirect("/")
-
-@app.route("/delete/<int:id>", methods=["POST"])
-def delete_application(id):
-    if "user_id" not in session:
-        return redirect("/login")
-
-    conn = get_db_connection()
-
-    conn.execute(
-        """
-        DELETE FROM applications
-        WHERE id = ?
-        AND user_id = ?
-        """,
-        (id, session["user_id"])
     )
 
     conn.commit()

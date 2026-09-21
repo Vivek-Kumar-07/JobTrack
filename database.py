@@ -135,6 +135,26 @@ if "user_id" not in existing_columns:
         "ALTER TABLE applications ADD COLUMN user_id INTEGER"
     )
 
+# Create indexes for frequently used queries
+conn.execute("""
+CREATE INDEX IF NOT EXISTS idx_applications_user_date
+ON applications(user_id, date)
+""")
+
+conn.execute("""
+CREATE INDEX IF NOT EXISTS idx_applications_user_status
+ON applications(user_id, status)
+""")
+
+conn.execute("""
+CREATE INDEX IF NOT EXISTS idx_applications_user_followup
+ON applications(user_id, follow_up_date)
+""")
+
+conn.execute("""
+CREATE INDEX IF NOT EXISTS idx_status_history_application
+ON status_history(application_id)
+""")
 
 conn.commit()
 conn.close()
