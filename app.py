@@ -17,6 +17,7 @@ DATABASE = os.path.join(BASE_DIR, "jobtrack.db")
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
 def validate_urls(company_url, job_url):
@@ -64,7 +65,7 @@ def signup():
 
         hashed_password = generate_password_hash(password)
 
-        conn = sqlite3.connect(DATABASE)
+        conn = get_db_connection()
 
         try:
 
@@ -102,8 +103,7 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
 
-        conn = sqlite3.connect(DATABASE)
-        conn.row_factory = sqlite3.Row
+        conn = get_db_connection()
 
         user = conn.execute(
             "SELECT * FROM users WHERE email = ?",
@@ -137,8 +137,7 @@ def profile():
     if "user_id" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
 
     user = conn.execute(
         """
@@ -161,8 +160,7 @@ def edit_application(id):
     if "user_id" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
 
     if request.method == "POST":
 
@@ -287,8 +285,7 @@ def application_details(id):
     if "user_id" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
 
     application = conn.execute(
     """
@@ -329,8 +326,7 @@ def view_notes(id):
     if "user_id" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
 
     if request.method == "POST":
 
@@ -398,7 +394,7 @@ def add_application():
 
     user_id = session["user_id"]
 
-    conn = sqlite3.connect(DATABASE)
+    conn = get_db_connection()
     cursor = conn.execute(
     """
     INSERT INTO applications
@@ -457,7 +453,7 @@ def delete_application(id):
     if "user_id" not in session:
         return redirect("/login")
 
-    conn =sqlite3.connect(DATABASE)
+    conn = get_db_connection()
 
     conn.execute(
         """
@@ -487,8 +483,7 @@ def home():
     from_date = request.args.get("from_date", "")
     to_date = request.args.get("to_date", "")
 
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
 
     query = "SELECT * FROM applications WHERE user_id = ?"
     params = [user_id]
@@ -664,8 +659,7 @@ def export_csv():
 
     user_id = session["user_id"]
 
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
 
     applications = conn.execute(
         """
