@@ -29,6 +29,7 @@
             <span>Welcome, {{ session["username"] }}</span>
 
             <form action="/logout" method="POST" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit">Logout</button>
             </form>
 

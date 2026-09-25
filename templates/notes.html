@@ -24,6 +24,7 @@
             <span>Welcome, {{ session["username"] }}</span>
 
             <form action="/logout" method="POST" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit">Logout</button>
             </form>
 
@@ -59,6 +60,7 @@
 <h3>Notes</h3>
 
 <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
     <textarea name="notes" class="notes-input"
               placeholder="Add your notes here...">{{ application["notes"] or "" }}</textarea>

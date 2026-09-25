@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, flash, Response
+from flask_wtf.csrf import CSRFProtect
 import sqlite3
 import os
 import csv
@@ -6,6 +7,7 @@ from datetime import date, datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+csrf = CSRFProtect(app)
 
 app.secret_key = os.environ.get("SECRET_KEY")
 app.config["SESSION_COOKIE_HTTPONLY"] = True
