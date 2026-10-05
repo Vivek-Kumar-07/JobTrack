@@ -46,6 +46,11 @@ def validate_status(status):
         return "Please select a valid application status."
     return None
 
+def validate_email(email):
+    if "@" not in email or "." not in email:
+        return "Please enter a valid email address."
+    return None
+
 def validate_application_date(application_date):
     try:
         parsed_date = datetime.strptime(
@@ -76,8 +81,10 @@ def signup():
             flash("Password must be at least 8 characters long.", "error")
             return redirect("/signup")
 
-        if "@" not in email or "." not in email:
-            flash("Please enter a valid email address.", "error")
+        email_error = validate_email(email)
+
+        if email_error:
+            flash(email_error, "error")
             return redirect("/signup")
 
         hashed_password = generate_password_hash(password)
