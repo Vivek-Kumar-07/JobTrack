@@ -31,6 +31,20 @@ def validate_urls(company_url, job_url):
 
     return None
 
+
+ALLOWED_STATUSES = {
+    "Applied",
+    "Interview",
+    "Rejected",
+    "Offer",
+}
+
+
+def validate_status(status):
+    if status not in ALLOWED_STATUSES:
+        return "Please select a valid application status."
+    return None
+
 def validate_application_date(application_date):
     try:
         parsed_date = datetime.strptime(
@@ -184,10 +198,17 @@ def edit_application(id):
 
         company = request.form["company"]
         role = request.form["role"]
-        status = request.form["status"]
+        status = request.form.get("status", "").strip()
+
+        status_error = validate_status(status)
+        if status_error:
+            flash(status_error, "error")
+            return redirect(f"/edit/{id}")
         date = request.form["date"]
 
         date_error = validate_application_date(date)
+
+
 
         if date_error:
             flash(date_error, "error")
@@ -425,7 +446,12 @@ def add_application():
 
     company = request.form["company"]
     role = request.form["role"]
-    status = request.form["status"]
+    status = request.form.get("status", "").strip()
+
+    status_error = validate_status(status)
+    if status_error:
+        flash(status_error, "error")
+        return redirect("/#add-application")
     date = request.form["date"]
     date_error = validate_application_date(date)
 
