@@ -64,6 +64,24 @@ def validate_application_date(application_date):
 
     return None
 
+def validate_email(email):
+    if "@" not in email or "." not in email:
+        return "Please enter a valid email address."
+    return None
+
+
+def validate_username(username):
+    if len(username) < 3:
+        return "Username must be at least 3 characters long."
+
+    if len(username) > 30:
+        return "Username must be at most 30 characters long."
+
+    if not username.replace("_", "").replace("-", "").isalnum():
+        return "Username can contain only letters, numbers, underscores, and hyphens."
+
+    return None
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
 
@@ -75,6 +93,12 @@ def signup():
 
         if not username or not email or not password:
             flash("All fields are required.", "error")
+            return redirect("/signup")
+
+        username_error = validate_username(username)
+
+        if username_error:
+            flash(username_error, "error")
             return redirect("/signup")
 
         if len(password) < 8:
