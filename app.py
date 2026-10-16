@@ -46,11 +46,6 @@ def validate_status(status):
         return "Please select a valid application status."
     return None
 
-def validate_email(email):
-    if "@" not in email or "." not in email:
-        return "Please enter a valid email address."
-    return None
-
 def validate_application_date(application_date):
     try:
         parsed_date = datetime.strptime(
