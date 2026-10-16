@@ -3,10 +3,13 @@ from flask_wtf.csrf import CSRFProtect
 import sqlite3
 import os
 import csv
+import logging
 from datetime import date, datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO)
+app.logger.setLevel(logging.INFO)
 csrf = CSRFProtect(app)
 
 app.secret_key = os.environ.get("SECRET_KEY")
@@ -815,6 +818,7 @@ def page_not_found(error):
 
 @app.errorhandler(500)
 def internal_server_error(error):
+    app.logger.error("Internal server error: %s", error)
     return "Something went wrong. Please try again later.", 500
 
 if __name__ == "__main__":
