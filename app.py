@@ -1,6 +1,12 @@
+from db import (
+    get_db_connection,
+    current_timestamp_sql,
+    monthly_date_sql,
+    uses_postgresql,
+    get_integrity_error,
+)
 from flask import Flask, render_template, request, redirect, session, flash, Response
 from flask_wtf.csrf import CSRFProtect
-import sqlite3
 import os
 import csv
 import logging
@@ -17,14 +23,6 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = os.environ.get("SESSION_COOKIE_SECURE", "False").lower() == "true"
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE = os.path.join(BASE_DIR, "jobtrack.db")
-
-def get_db_connection():
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
 
 def validate_urls(company_url, job_url):
     if company_url and not company_url.startswith(("http://", "https://")):
@@ -126,7 +124,7 @@ def signup():
 
             conn.commit()
 
-        except sqlite3.IntegrityError:
+        except get_integrity_error():
 
             conn.close()
 
@@ -296,15 +294,15 @@ def edit_application(id):
         # Record status change
 
         if old_status != status:
-
             conn.execute(
-                """
+                f"""
                 INSERT INTO status_history
                 (application_id, status, changed_at)
-                VALUES (?, ?, datetime('now'))
+                VALUES (?, ?, {current_timestamp_sql()})
                 """,
                 (id, status)
             )
+
 
         conn.commit()
         conn.close()
@@ -505,51 +503,56 @@ def add_application():
 
     conn = get_db_connection()
     cursor = conn.execute(
-    """
-    INSERT INTO applications
-    (
-        company,
-        role,
-        status,
-        date,
-        notes,
-        interview_date,
-        interview_time,
-        interview_type,
-        follow_up_date,
-        company_url,
-        job_url,
-        user_id
+        f"""
+        INSERT INTO applications
+        (
+            company,
+            role,
+            status,
+            date,
+            notes,
+            interview_date,
+            interview_time,
+            interview_type,
+            follow_up_date,
+            company_url,
+            job_url,
+            user_id
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        {"RETURNING id" if uses_postgresql() else ""}
+        """,
+        (
+            company,
+            role,
+            status,
+            date,
+            notes,
+            interview_date,
+            interview_time,
+            interview_type,
+            follow_up_date,
+            company_url,
+            job_url,
+            user_id
+        )
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """,
-    (
-        company,
-        role,
-        status,
-        date,
-        notes,
-        interview_date,
-        interview_time,
-        interview_type,
-        follow_up_date,
-        company_url,
-        job_url,
-        user_id
-    )
-)
-    # Record initial status
 
-    application_id = cursor.lastrowid
+
+    if uses_postgresql():
+        application_id = cursor.fetchone()["id"]
+    else:
+        application_id = cursor.lastrowid
 
     conn.execute(
-        """
+        f"""
         INSERT INTO status_history
         (application_id, status, changed_at)
-        VALUES (?, ?, datetime('now'))
+        VALUES (?, ?, {current_timestamp_sql()})
         """,
         (application_id, status)
     )
+
 
     conn.commit()
     conn.close()
@@ -674,28 +677,20 @@ def home():
     # Monthly Application Analytics
 
     monthly_analytics = conn.execute(
-        """
-        SELECT
-            strftime('%Y-%m', date) AS month,
-
-            COUNT(*) AS applications,
-
-            SUM(CASE WHEN status = 'Interview' THEN 1 ELSE 0 END) AS interviews,
-
-            SUM(CASE WHEN status = 'Offer' THEN 1 ELSE 0 END) AS offers,
-
-            SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) AS rejected
-
-        FROM applications
-
-        WHERE user_id = ?
-
-        GROUP BY month
-
-        ORDER BY month ASC
-        """,
-        (user_id,)
-    ).fetchall()
+    f"""
+    SELECT
+        {monthly_date_sql()} AS month,
+        COUNT(*) AS applications,
+        SUM(CASE WHEN status = 'Interview' THEN 1 ELSE 0 END) AS interviews,
+        SUM(CASE WHEN status = 'Offer' THEN 1 ELSE 0 END) AS offers,
+        SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) AS rejected
+    FROM applications
+    WHERE user_id = ?
+    GROUP BY month
+    ORDER BY month ASC
+    """,
+    (user_id,)
+).fetchall()
 
     monthly_analytics = [
     {
