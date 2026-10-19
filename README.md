@@ -95,6 +95,23 @@ Do not commit database credentials, production secrets, or private user data to 
 - Building dashboards and analytics from application data.
 - Deploying a Flask application and configuring its production database.
 
+## Screenshots
+
+### Dashboard & Analytics
+![JobTrack Dashboard](screenshots/Dashboard%20%26%20Analytics.png)
+
+### Follow-ups & Applications
+![Follow-ups and Applications](screenshots/Follow-ups%20%26%20Applications.png)
+
+### Add Application Form
+![Add Application Form](screenshots/Add%20Application%20Form.png)
+
+### Application Details
+![Application Details](screenshots/Application%20Details.png)
+
+### Application Details & Status History
+![Application Details and Status History](screenshots/Application%20Details%20%26%20Status%20History.png)
+
 ## Author
 
 **Vivek Kumar**  
